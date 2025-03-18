@@ -1,9 +1,9 @@
 const { sequelize } = require('../db');
-const userModel = require('../Models/Users')(sequelize);
+const UserModel = require('../Models/Users')(sequelize);
 const { Op } = require("sequelize");
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
+const multer = require('multer'); 
 const jwt = require("jsonwebtoken");
 const path = require('path');
 const bcrypt = require("bcrypt");
@@ -26,45 +26,57 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-// Register Route
-router.post("/register", upload.single("profilePicture"), async (req, res) => {
+router.post("/register", upload.single("profilePic"), async (req, res) => {
   try {
-    const hashPassword = await bcrypt.hash(req.body.password, 10);
-    req.body.password = hashPassword;
+    console.log("Received Data:", req.body);
 
-    if (req.file) {
-      req.body.profilePicture = `${req.file.filename}`;
+    // Hash password
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    const user = await userModel.create(req.body);
-    return successResponse(res, "User added successfully", user);
+    // Handle file upload
+    if (req.file) {
+      req.body.profilePic = req.file.filename;
+      console.log("Uploaded File:", req.file.filename);
+    }
 
+    // Create User
+    const user = UserModel.create(req.body);
+    return successResponse(res, "User added successfully", user);
   } catch (error) {
-    return errorResponse(res, "Error saving the user", error);
+    console.error("Error Saving User:", error);
+    return errorResponse(res, "Error saving user", error);
   }
 });
+
 
 // Login Route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userModel.findOne({ where: { email } });
+    
+    // Await the query to get the user
+    const user = await UserModel.findOne({ where: { email } });
 
     if (!user) {
       return errorResponse(res, "User not found");
     }
 
+    // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return errorResponse(res, "Invalid password");
     }
 
+    // Generate token
     const token = jwt.sign(
-      { id: user.id, email: user.email, firstName: user.firstName },
+      { userId: user.userId, email: user.email, userName: user.userName },
       "vamsi@1998"
     );
 
+    // Set the token as a cookie
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "None",
@@ -75,31 +87,42 @@ router.post("/login", async (req, res) => {
     return successResponse(res, "Login successful", {
       token,
       user: {
-        id: user.id,
+        userId: user.userId,
         email: user.email,
-        firstName: user.firstName,
-        role: user.role
+        userName: user.userName,
+       
       }
     });
 
   } catch (error) {
+    console.error("Login Error:", error); // Log the error to debug
     return errorResponse(res, "Login failed", error);
   }
 });
 
+
 // Profile Route
-router.get("/profile", userAuth, async (req, res) => {
+router.get("/get-user", userAuth, async (req, res) => {
   try {
-    return successResponse(res, "User profile fetched successfully", req.user);
+    const { userId } = req.user; // Extract userId from req.user
+
+    const user = UserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return successResponse(res, "User profile fetched successfully", user);
   } catch (error) {
     return errorResponse(res, "Failed to fetch profile", error);
   }
 });
 
+
 // Get All Profiles
-router.get("/all-profiles", userAuth, async (req, res) => {
+router.get("/all-user", userAuth, async (req, res) => {
   try {
-    const users = await userModel.findAll();
+    const users = UserModel.findAll();
     return successResponse(res, "All users fetched successfully", users);
   } catch (error) {
     return errorResponse(res, "Failed to fetch users", error);
@@ -107,27 +130,31 @@ router.get("/all-profiles", userAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/user-update", userAuth, upload.single("profilePicture"), async (req, res) => {
+router.patch("/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
-    const loggedinUser = req.user;
+    const { userId } = req.user; // Extract userId from authenticated user
 
-    if (userData.file) {
-      const getUserDate = await brand_controller.getBrandById(userData.body.brand_id)
+    // Await the database query to get the user
+    const user = await UserModel.findOne({ where: { userId } });
 
-      if (getUserDate.brand_image !== null) {
-          await deleteImage(getUserDate.brand_image)
-          userData.body.brand_image = userData.file.filename
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Handle Profile Picture Update
+    if (req.file) {
+      if (user.profilePic) {
+        await deleteImage(user.profilePic); // Delete old image if exists
       }
-      else {
-          userData.body.brand_image = userData.file.filename
-      }
-  }
+      req.body.profilePic = req.file.filename; // Set new profile picture filename
+    }
 
+    // Update User Data
+    await user.update(req.body);
 
-    await loggedinUser.update(req.body);
-
-    return successResponse(res, "Profile updated successfully", loggedinUser);
+    return successResponse(res, "Profile updated successfully", user);
   } catch (error) {
+    console.error("Profile Update Error:", error); // Log the error
     return errorResponse(res, "Profile update failed", error);
   }
 });
@@ -138,21 +165,34 @@ router.post("/logout", (req, res) => {
   return successResponse(res, "Logged out successfully");
 });
 
-// Search User
-router.get("/search", userAuth, async (req, res) => {
+// Delete User by userId
+router.delete("/delete-user", userAuth, async (req, res) => {
   try {
-    const findUser = await userModel.findOne({ where: req.body });
-    return successResponse(res, "User found", findUser);
+    const { userId } = req.user;
+
+    // Await the database query to fetch the user
+    const user = await UserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Delete the user
+    await user.destroy();
+
+    return successResponse(res, "User deleted successfully");
   } catch (error) {
-    return errorResponse(res, "User search failed", error);
+    console.error("User Deletion Error:", error); // Log the error for debugging
+    return errorResponse(res, "User deletion failed", error);
   }
 });
+
 
 // Forgot Password
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    const user = await userModel.findOne({ where: { email } });
+    const user = UserModel.findOne({ where: { email } });
 
     if (!user) {
       return errorResponse(res, "User does not exist");

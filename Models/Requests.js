@@ -1,8 +1,9 @@
+const { request } = require('express');
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-    const SubCategory = sequelize.define('categories', {
-        categoryId: {
+    const SubCategory = sequelize.define('requests', {
+        requestId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -11,11 +12,13 @@ module.exports = (sequelize) => {
         },
 
 
-        categoryName: { type: DataTypes.STRING },
+        dateOfRequest: { type: DataTypes.STRING },
 
-        categoryImage: { type: DataTypes.JSON },
+        requestName: { type: DataTypes.STRING },
 
-        description: { type: DataTypes.STRING },
+        requestBy: { type: DataTypes.STRING },
+
+        status: { type: DataTypes.STRING },
         
         createdAt: {
             type: DataTypes.DATE,
@@ -28,7 +31,7 @@ module.exports = (sequelize) => {
         },
     }, {
         timestamps: true,
-        tableName: 'categories'
+        tableName: 'requests'
     });
 
     return SubCategory;

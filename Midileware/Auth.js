@@ -1,34 +1,69 @@
 const jwt = require("jsonwebtoken");
-const systemUserModel = require("../Models/SystemUser");
+const { sequelize } = require('../db');
+const systemUserModel = require('../Models/SystemUser')(sequelize);
+const UserModel = require('../Models/Users')(sequelize);
 
-const userAuth = async (req, res, next) => {
+const { Op } = require("sequelize");
+
+const SystemUserAuth = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
-    if (!token) {
-      throw new Error("Invalid token");
+    if (!req.cookies || !req.cookies.token) {
+      return res.status(401).json({ error: "Token is missing" });
     }
 
-    // Verify the token and extract user ID
-    const verifyToken = await jwt.verify(token, "vamsi@1998", {
-      expiresIn: "10h",
-    });
+    const token = req.cookies.token;
+    const verifyToken = jwt.verify(token, "vamsi@1998"); 
+
     const { userId } = verifyToken;
 
-    // Find the user by ID
-    const user = await systemUserModel.findById(userId);
+    // Fetch user by ID
+    const user = await systemUserModel.findOne({ where: { userId } });
+
     if (!user) {
-      throw new Error("User does not exist");
+      return res.status(401).json({ error: "User does not exist" });
     }
-    if (!user.role === "Super Admin" ||!user.role === " Admin") {
-      throw new Error("Invalid user");
+
+    if (user.role !== "Super Admin" && user.role !== "Admin") {
+      return res.status(403).json({ error: "Invalid user role" });
     }
-    // Attach user to request object
+
     req.user = user;
-    next(); // Pass control to the next middleware
+    next();
   } catch (error) {
-    // Send the error message in response
     res.status(400).json({ error: error.message });
   }
 };
 
-module.exports = { userAuth };
+
+const userAuth = async (req, res, next) => {
+  try {
+    if (!req.cookies || !req.cookies.token) {
+      return res.status(401).json({ error: "Token is missing" });
+    }
+
+    const token = req.cookies.token;
+    const verifyToken = jwt.verify(token, "vamsi@1998"); 
+
+    const { userId } = verifyToken;
+
+    // Fetch user by ID
+    const user = await UserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(401).json({ error: "User does not exist" });
+    }
+
+    // if (user.role !== "Super Admin" && user.role !== "Admin") {
+    //   return res.status(403).json({ error: "Invalid user role" });
+    // }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+
+module.exports = {SystemUserAuth, userAuth };

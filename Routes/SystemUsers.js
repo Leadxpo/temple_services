@@ -1,5 +1,5 @@
 const { sequelize } = require('../db');
-const userModel = require('../Models/SystemUser')(sequelize);
+const systemUserModel = require('../Models/SystemUser')(sequelize);
 const { Op } = require("sequelize");
 const express = require('express');
 const router = express.Router();
@@ -9,7 +9,7 @@ const path = require('path');
 const bcrypt = require("bcrypt");
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { deleteImage } = require("../Midileware/deleteimages");
-const { userAuth } = require("../Midileware/Auth");
+const { SystemUserAuth } = require("../Midileware/Auth");
 
 // Image configuration
 const imageconfig = multer.diskStorage({
@@ -26,34 +26,45 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-// Register Route
-router.post("/register", upload.single("profilePicture"), async (req, res) => {
+router.post("/register", upload.single("profilePic"), async (req, res) => {
   try {
-    const hashPassword = await bcrypt.hash(req.body.password, 10);
-    req.body.password = hashPassword;
+    console.log("Received Data:", req.body);
 
-    if (req.file) {
-      req.body.profilePicture = `${req.file.filename}`;
+    // Hash password
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    const user = await userModel.create(req.body);
-    return successResponse(res, "User added successfully", user);
+    // Handle file upload
+    if (req.file) {
+      req.body.profilePic = req.file.filename;
+      console.log("Uploaded File:", req.file.filename);
+    }
 
+    // Generate UUID if `userId` is not provided
+    if (!req.body.userId) {
+      req.body.userId = require("uuid").v4();
+    }
+
+    // Create User
+    const user = systemUserModel.create(req.body);
+    return successResponse(res, "User added successfully", user);
   } catch (error) {
-    return errorResponse(res, "Error saving the user", error);
+    console.error("Error Saving User:", error);
+    return errorResponse(res, "Error saving user", error);
   }
 });
+
 
 // Login Route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userModel.findOne({ where: { email } });
+    const user = systemUserModel.findOne({ where: { email } });
 
     if (!user) {
       return errorResponse(res, "User not found");
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -61,7 +72,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, firstName: user.firstName },
+      { userId: user.userId, email: user.email, userName: user.userName },
       "vamsi@1998"
     );
 
@@ -75,9 +86,9 @@ router.post("/login", async (req, res) => {
     return successResponse(res, "Login successful", {
       token,
       user: {
-        id: user.id,
+        userId: user.userId,
         email: user.email,
-        firstName: user.firstName,
+        userName: user.userName,
         role: user.role
       }
     });
@@ -88,18 +99,27 @@ router.post("/login", async (req, res) => {
 });
 
 // Profile Route
-router.get("/profile", userAuth, async (req, res) => {
+router.get("/get-user", SystemUserAuth, async (req, res) => {
   try {
-    return successResponse(res, "User profile fetched successfully", req.user);
+    const { userId } = req.user; // Extract userId from req.user
+
+    const user = systemUserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return successResponse(res, "User profile fetched successfully", user);
   } catch (error) {
     return errorResponse(res, "Failed to fetch profile", error);
   }
 });
 
+
 // Get All Profiles
-router.get("/all-profiles", userAuth, async (req, res) => {
+router.get("/all-user", SystemUserAuth, async (req, res) => {
   try {
-    const users = await userModel.findAll();
+    const users = systemUserModel.findAll();
     return successResponse(res, "All users fetched successfully", users);
   } catch (error) {
     return errorResponse(res, "Failed to fetch users", error);
@@ -107,26 +127,27 @@ router.get("/all-profiles", userAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/user-update", userAuth, upload.single("profilePicture"), async (req, res) => {
+router.patch("/user-update", SystemUserAuth, upload.single("profilePic"), async (req, res) => {
   try {
-    const loggedinUser = req.user;
+    const { userId } = req.user; // Extract userId from authenticated user
+    const user = systemUserModel.findOne({ where: { userId } });
 
-    if (userData.file) {
-      const getUserDate = await brand_controller.getBrandById(userData.body.brand_id)
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-      if (getUserDate.brand_image !== null) {
-          await deleteImage(getUserDate.brand_image)
-          userData.body.brand_image = userData.file.filename
+    // Handle Profile Picture Update
+    if (req.file) {
+      if (user.profilePic) {
+        await deleteImage(user.profilePic); // Delete old image if exists
       }
-      else {
-          userData.body.brand_image = userData.file.filename
-      }
-  }
+      req.body.profilePic = req.file.filename; // Set new profile picture filename
+    }
 
+    // Update User Data
+    await user.update(req.body);
 
-    await loggedinUser.update(req.body);
-
-    return successResponse(res, "Profile updated successfully", loggedinUser);
+    return successResponse(res, "Profile updated successfully", user);
   } catch (error) {
     return errorResponse(res, "Profile update failed", error);
   }
@@ -138,21 +159,33 @@ router.post("/logout", (req, res) => {
   return successResponse(res, "Logged out successfully");
 });
 
-// Search User
-router.get("/search", userAuth, async (req, res) => {
+// Delete User by userId
+router.delete("/delete-user", SystemUserAuth, async (req, res) => {
   try {
-    const findUser = await userModel.findOne({ where: req.body });
-    return successResponse(res, "User found", findUser);
+    const { userId } = req.user;
+
+    // Find user by userId
+    const user = systemUserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Delete the user
+    await user.destroy();
+
+    return successResponse(res, "User deleted successfully");
   } catch (error) {
-    return errorResponse(res, "User search failed", error);
+    return errorResponse(res, "User deletion failed", error);
   }
 });
+
 
 // Forgot Password
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    const user = await userModel.findOne({ where: { email } });
+    const user = systemUserModel.findOne({ where: { email } });
 
     if (!user) {
       return errorResponse(res, "User does not exist");
@@ -168,7 +201,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // Reset Password
-router.post("/reset-password", userAuth, async (req, res) => {
+router.post("/reset-password", SystemUserAuth, async (req, res) => {
   try {
     const { password, newPassword } = req.body;
     const user = req.user;

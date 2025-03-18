@@ -1,18 +1,21 @@
-const successResponse=(data)=>({
-    
-    data: data,
-    error: null,
-    success:true
-})
-const errorResponse=(data)=>({
-error: data,
-message: "User not found",
-success:false
+const successResponse = (res, message, data = null) => {
+    return res.status(200).json({
+        success: true,
+        message,
+        data,
+        error: null,
+    });
+};
 
-})
+const errorResponse = (res, message, error = null, statusCode = 400) => {
+    return res.status(statusCode).json({
+        success: false,
+        message,
+        error,
+    });
+};
 
-module.exports=
-{
-successResponse,
-errorResponse
-}
+module.exports = {
+    successResponse,
+    errorResponse,
+};
