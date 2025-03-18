@@ -1,2 +1,2 @@
 # GigHelp_services
-posting
+Backend services for GIGHELP applications for both web,Dashboard and Mobile Applications
