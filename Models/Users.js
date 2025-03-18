@@ -14,10 +14,11 @@ module.exports = (Sequelize) => {
 
             profilePic: { type: DataTypes.STRING },
 
-            emergencyContact: { type: DataTypes.STRING, allowNull: true },
+            identityProof: { type: DataTypes.STRING, JSON },
 
-            skills: { type: DataTypes.STRING },
+            identityNumber: { type: DataTypes.STRING, JSON },
 
+            skills: { type: DataTypes.JSON },
 
             status: {
                 type: DataTypes.STRING,

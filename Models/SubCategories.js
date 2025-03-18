@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-    const SubCategory = sequelize.define('sub_categories', {
-        Id: {
+    const SubCategory = sequelize.define('subcategories', {
+        SubCategoryId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -11,11 +11,11 @@ module.exports = (sequelize) => {
         },
 
 
-        Name: { type: DataTypes.STRING },
+        SubCategoryName: { type: DataTypes.STRING },
 
-        categories_id: { type: DataTypes.STRING },
+        categoryId: { type: DataTypes.STRING },
 
-        sub_categories_image: { type: DataTypes.JSON },
+       subCategoryImage: { type: DataTypes.JSON },
 
         description: { type: DataTypes.STRING },
         
@@ -30,7 +30,7 @@ module.exports = (sequelize) => {
         },
     }, {
         timestamps: true,
-        tableName: 'sub_categories'
+        tableName: 'subcategories'
     });
 
     return SubCategory;

@@ -1,8 +1,9 @@
+const { request } = require('express');
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-    const SubCategory = sequelize.define('categories', {
-        categoryId: {
+    const SubCategory = sequelize.define('Transections', {
+        transectionId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -10,12 +11,12 @@ module.exports = (sequelize) => {
           
         },
 
-
-        categoryName: { type: DataTypes.STRING },
-
-        categoryImage: { type: DataTypes.JSON },
-
-        description: { type: DataTypes.STRING },
+        dateOfPayment: { type: DataTypes.STRING },
+        taskOwner: { type: DataTypes.STRING },
+        taskUser: { type: DataTypes.STRING },
+        typeOfPayment: { type: DataTypes.STRING },
+        payment: { type: DataTypes.STRING },
+        status: { type: DataTypes.STRING },
         
         createdAt: {
             type: DataTypes.DATE,
@@ -28,7 +29,7 @@ module.exports = (sequelize) => {
         },
     }, {
         timestamps: true,
-        tableName: 'categories'
+        tableName: 'Transections'
     });
 
     return SubCategory;
