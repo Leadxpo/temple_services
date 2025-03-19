@@ -1,28 +1,26 @@
-const { DataTypes, Sequelize } = require('sequelize');
-module.exports = (Sequelize) => {
-    const usermodel = Sequelize.define('Task', {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+    const TaskModel = sequelize.define('Task', {
         taskId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             allowNull: false,
-            autoIncrement: true, // Use autoIncrement for automatic ID generation
-        
+            autoIncrement: true, // Ensure ID is auto-incremented
         },
-        task: { type: DataTypes.STRING, },
-        Categories: { type: DataTypes.STRING, },
-        SubCategory: { type: DataTypes.STRING, },
-        targetedPostIn: { type: DataTypes.STRING, },
-        amount: { type: DataTypes.STRING, },
-        phoneNumber: { type: DataTypes.STRING, },
-        description: { type: DataTypes.STRING, },
-        status: { type: DataTypes.STRING, },
-
-
-        Task_image: { type: DataTypes.STRING, },
+        task: { type: DataTypes.STRING, allowNull: false },  // Added allowNull: false to ensure data must be present
+        Categories: { type: DataTypes.STRING, allowNull: false },
+        SubCategory: { type: DataTypes.STRING },
+        targetedPostIn: { type: DataTypes.STRING },
+        amount: { type: DataTypes.STRING },
+        phoneNumber: { type: DataTypes.STRING },
+        description: { type: DataTypes.STRING },
+        status: { type: DataTypes.STRING },
+      
     }, {
         timestamps: true,
         tableName: 'Task'
     });
 
-    return usermodel;
-}
+    return TaskModel;
+};
