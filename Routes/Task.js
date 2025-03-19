@@ -7,13 +7,25 @@ const router = express.Router();
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
-// Create Task
 router.post("/create", userAuth, async (req, res) => {
   try {
-    const task = await TaskModel.create(req.body);
-    return successResponse(res, "Task created successfully", task);
+      console.log("Received Task Data:", req.body); // Debugging step
+
+      const { task, Categories, amount, phoneNumber } = req.body;
+
+      if (!task || !Categories || !amount || !phoneNumber) {
+          return res.status(400).json({
+              success: false,
+              message: "Missing required fields",
+              error: { required: ["task", "Categories", "amount", "phoneNumber"] }
+          });
+      }
+
+      const taskData = await TaskModel.create(req.body);
+      return res.status(201).json({ success: true, message: "Task created successfully", data: taskData });
   } catch (error) {
-    return errorResponse(res, "Error creating task", error);
+      console.error("Error creating task:", error);
+      return res.status(500).json({ success: false, message: "Error creating task", error });
   }
 });
 
