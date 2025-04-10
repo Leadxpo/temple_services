@@ -2,7 +2,10 @@ const { DataTypes, Sequelize } = require('sequelize')
 module.exports = (Sequelize) => {
     const UserModel = Sequelize.define('Users',
         {
-            userId: { type: DataTypes.STRING, primaryKey: true },
+            id: {  type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
+                allowNull: false, },
 
             userName: { type: DataTypes.STRING, },
 
@@ -10,23 +13,21 @@ module.exports = (Sequelize) => {
 
             email: { type: DataTypes.STRING, unique: true, },
 
+            userId: { type: DataTypes.STRING, unique: true, },
+
             password: { type: DataTypes.STRING, },
 
+            aadharNumber: { type: DataTypes.STRING,  },
+            
+            address: { type: DataTypes.STRING, },
+            
+            dob: { type: DataTypes.STRING },
+            
+            marrege_status: { type: DataTypes.STRING },
+            
             profilePic: { type: DataTypes.STRING },
 
-            identityProof: { type: DataTypes.STRING, JSON },
-
-            identityNumber: { type: DataTypes.STRING, JSON },
-
-            skills: { type: DataTypes.JSON },
-
-            status: {
-                type: DataTypes.STRING,
-                defaultValue: "Pending",
-                validate: {
-                    isIn: [["Declined", "Approved", "Pending"]]
-                },
-            },
+           
 
             createdAt: {
                 type: DataTypes.DATE,

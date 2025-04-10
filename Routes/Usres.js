@@ -54,10 +54,10 @@ router.post("/register", upload.single("profilePic"), async (req, res) => {
 // Login Route
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { userId, password } = req.body;
     
     // Await the query to get the user
-    const user = await UserModel.findOne({ where: { email } });
+    const user = await UserModel.findOne({ where: { userId } });
 
     if (!user) {
       return errorResponse(res, "User not found");
@@ -90,6 +90,16 @@ router.post("/login", async (req, res) => {
         userId: user.userId,
         email: user.email,
         userName: user.userName,
+        phoneNumber: user.phoneNumber,
+        aadharNumber: user.aadharNumber,
+        address: user.address,
+        dob: user.dob,
+        marrege_status: user.marrege_status,
+        gender: user.gender,
+        password: user.password,
+        id: user.id,
+        profilePic: user.profilePic,
+
        
       }
     });
