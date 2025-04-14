@@ -18,12 +18,14 @@ module.exports = (Sequelize) => {
             password: { type: DataTypes.STRING, },
 
             aadharNumber: { type: DataTypes.STRING,  },
+
+            donateNumber: { type: DataTypes.STRING,  },
             
             address: { type: DataTypes.STRING, },
             
             dob: { type: DataTypes.STRING },
             
-            marrege_status: { type: DataTypes.STRING },
+            marriage_status: { type: DataTypes.STRING },
             
             profilePic: { type: DataTypes.STRING },
 
