@@ -26,11 +26,11 @@ const createtable = () => {
   try {
     sequelize.authenticate();
 
-        systemUser.sync({ alter: false })
-        User.sync({ alter: false })
-        Otp.sync({ alter: false })
-        BlockedNumbers.sync({ alter: false })
-        Payments.sync({ alter: false })
+        systemUser.sync({ alter: true })
+        User.sync({ alter: true })
+        Otp.sync({ alter: true })
+        BlockedNumbers.sync({ alter: true })
+        Payments.sync({ alter: true })
         Donate.sync({ alter: true })
 
 
