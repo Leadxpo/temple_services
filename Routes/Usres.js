@@ -10,11 +10,18 @@ const bcrypt = require("bcrypt");
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { deleteImage } = require("../Midileware/deleteimages");
 const { userAuth } = require("../Midileware/Auth");
+const fs = require('fs');
 
-// Image configuration
+// Ensure the directory exists
+const uploadDir = path.join(__dirname, "../storege/userdp");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer image configuration
 const imageconfig = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, "./storege/userdp");
+    callback(null, uploadDir);
   },
   filename: (req, file, callback) => {
     callback(null, Date.now() + path.extname(file.originalname));
@@ -26,7 +33,8 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-router.post("/register", upload.single("profilePic"), async (req, res) => {
+// Register route
+router.post("/api/register", upload.single("profilePic"), async (req, res) => {
   try {
     console.log("Received Data:", req.body);
 
@@ -35,14 +43,14 @@ router.post("/register", upload.single("profilePic"), async (req, res) => {
       req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    // Handle file upload
+    // Attach uploaded file
     if (req.file) {
       req.body.profilePic = req.file.filename;
       console.log("Uploaded File:", req.file.filename);
     }
 
     // Create User
-    const user = UserModel.create(req.body);
+    const user = await UserModel.create(req.body);
     return successResponse(res, "User added successfully", user);
   } catch (error) {
     console.error("Error Saving User:", error);
@@ -50,9 +58,8 @@ router.post("/register", upload.single("profilePic"), async (req, res) => {
   }
 });
 
-
 // Login Route
-router.post("/login", async (req, res) => {
+router.post("/api/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
     
@@ -112,7 +119,7 @@ router.post("/login", async (req, res) => {
 
 
 // Profile Route
-router.get("/get-user", userAuth, async (req, res) => {
+router.get("/api/get-user", userAuth, async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from req.user
 
@@ -130,7 +137,7 @@ router.get("/get-user", userAuth, async (req, res) => {
 
 
 // Get All Profiles
-router.get("/all-user", userAuth, async (req, res) => {
+router.get("/api/all-user", userAuth, async (req, res) => {
   try {
     const users = UserModel.findAll();
     return successResponse(res, "All users fetched successfully", users);
@@ -140,7 +147,7 @@ router.get("/all-user", userAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
+router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from authenticated user
 
@@ -176,7 +183,7 @@ router.post("/logout", (req, res) => {
 });
 
 // Delete User by userId
-router.delete("/delete-user", userAuth, async (req, res) => {
+router.delete("/api/delete-user", userAuth, async (req, res) => {
   try {
     const { userId } = req.user;
 
@@ -199,7 +206,7 @@ router.delete("/delete-user", userAuth, async (req, res) => {
 
 
 // Forgot Password
-router.post("/forgot-password", async (req, res) => {
+router.post("/api/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = UserModel.findOne({ where: { email } });
@@ -218,7 +225,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // Reset Password
-router.post("/reset-password", userAuth, async (req, res) => {
+router.post("/api/reset-password", userAuth, async (req, res) => {
   try {
     const { password, newPassword } = req.body;
     const user = req.user;

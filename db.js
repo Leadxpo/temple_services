@@ -3,14 +3,9 @@ const { Sequelize, Model } = require('sequelize')
 const systemUserModel = require('./Models/SystemUser')
 const UserModel = require('./Models/Users')
 const OtpModel = require('./Models/Otp')
-
-
-
-
-
-
-
-
+const BlockedNumbersModel = require('./Models/BlockedNumbers')
+const PaymentsModel = require('./Models/Payments')
+const DonateModel = require('./Models/DonateNumbers')
 
 
 
@@ -30,9 +25,9 @@ const sequelize = new Sequelize(
 const systemUser = systemUserModel(sequelize)
 const User = UserModel(sequelize)
 const Otp = OtpModel(sequelize)
-
-
-
+const BlockedNumbers = BlockedNumbersModel(sequelize)
+const Payments = PaymentsModel(sequelize)
+const Donate = DonateModel(sequelize)
 
 
 
@@ -45,6 +40,11 @@ const createtable = () => {
         systemUser.sync({ alter: false })
         User.sync({ alter: true })
         Otp.sync({ alter: false })
+        BlockedNumbers.sync({ alter: false })
+        Payments.sync({ alter: false })
+        Donate.sync({ alter: false })
+
+
        
 
 
