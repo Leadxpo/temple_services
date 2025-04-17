@@ -4,6 +4,10 @@ const systemUserModel = require("./Models/SystemUser");
 const UserModel = require("./Models/Users");
 const OtpModel = require("./Models/Otp");
 const BlockedNumberModel = require("./Models/BlockedNumbers");
+const DonateNumberModel = require("./Models/DonateNumbers");
+const PaymentModel = require("./Models/Payments");
+
+
 
 
 const sequelize = new Sequelize(
@@ -21,17 +25,23 @@ const sequelize = new Sequelize(
 const systemUser = systemUserModel(sequelize);
 const User = UserModel(sequelize);
 const Otp = OtpModel(sequelize);
+const BlockedNumbers = BlockedNumberModel(sequelize);
+const DonateNumbers = DonateNumberModel(sequelize);
+const Payments = PaymentModel(sequelize);
+
+
+
 
 const createtable = () => {
   try {
     sequelize.authenticate();
 
-        systemUser.sync({ alter: true })
-        User.sync({ alter: true })
-        Otp.sync({ alter: true })
-        BlockedNumbers.sync({ alter: true })
-        Payments.sync({ alter: true })
-        Donate.sync({ alter: true })
+        systemUser.sync({ alter: false })
+        User.sync({ alter: false })
+        Otp.sync({ alter: false })
+        BlockedNumbers.sync({ alter: false })
+        Payments.sync({ alter: false })
+        DonateNumbers.sync({ alter: false })
 
 
        
