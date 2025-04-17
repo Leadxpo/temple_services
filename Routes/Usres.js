@@ -3,6 +3,7 @@ const UserModel = require('../Models/Users')(sequelize);
 const { Op } = require("sequelize");
 const express = require('express');
 const router = express.Router();
+
 const multer = require('multer'); 
 const jwt = require("jsonwebtoken");
 const path = require('path');
@@ -26,7 +27,7 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-router.post("/register", upload.single("profilePic"), async (req, res) => {
+router.post("/api/register", upload.single("profilePic"), async (req, res) => {
   try {
     console.log("Received Data:", req.body);
 
@@ -43,16 +44,17 @@ router.post("/register", upload.single("profilePic"), async (req, res) => {
 
     // Create User
     const user = UserModel.create(req.body);
+    console.log("user.......",user)
     return successResponse(res, "User added successfully", user);
   } catch (error) {
-    console.error("Error Saving User:", error);
+    console.error("Error Saving User:", error); 
     return errorResponse(res, "Error saving user", error);
   }
 });
 
 
 // Login Route
-router.post("/login", async (req, res) => {
+router.post("/api/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
     
@@ -94,7 +96,7 @@ router.post("/login", async (req, res) => {
         aadharNumber: user.aadharNumber,
         address: user.address,
         dob: user.dob,
-        marrege_status: user.marrege_status,
+        marrege_status: user.marregeStatus,
         gender: user.gender,
         password: user.password,
         id: user.id,
@@ -112,7 +114,7 @@ router.post("/login", async (req, res) => {
 
 
 // Profile Route
-router.get("/get-user", userAuth, async (req, res) => {
+router.get("/api/get-user", userAuth, async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from req.user
 
@@ -130,7 +132,7 @@ router.get("/get-user", userAuth, async (req, res) => {
 
 
 // Get All Profiles
-router.get("/all-user", userAuth, async (req, res) => {
+router.get("/api/all-user", userAuth, async (req, res) => {
   try {
     const users = UserModel.findAll();
     return successResponse(res, "All users fetched successfully", users);
@@ -140,7 +142,7 @@ router.get("/all-user", userAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
+router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from authenticated user
 
@@ -170,13 +172,13 @@ router.patch("/user-update", userAuth, upload.single("profilePic"), async (req, 
 });
 
 // Logout
-router.post("/logout", (req, res) => {
+router.post("/api/logout", (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
   return successResponse(res, "Logged out successfully");
 });
 
 // Delete User by userId
-router.delete("/delete-user", userAuth, async (req, res) => {
+router.delete("/api/delete-user", userAuth, async (req, res) => {
   try {
     const { userId } = req.user;
 
@@ -199,7 +201,7 @@ router.delete("/delete-user", userAuth, async (req, res) => {
 
 
 // Forgot Password
-router.post("/forgot-password", async (req, res) => {
+router.post("/api/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = UserModel.findOne({ where: { email } });
@@ -218,7 +220,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // Reset Password
-router.post("/reset-password", userAuth, async (req, res) => {
+router.post("/api/reset-password", userAuth, async (req, res) => {
   try {
     const { password, newPassword } = req.body;
     const user = req.user;
