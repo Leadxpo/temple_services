@@ -6,18 +6,16 @@ const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
-// Create Donate Number
-router.post("/api/create-donate-number", userAuth, async (req, res) => {
+router.post("/api/create-donate-number", async (req, res) => {
   try {
-    const { donateNumber, description} = req.body;
-
-    const donate = await DonateNumberModel.create({ donateNumber, description });
-
+    console.log("Form Data Received:", req.body);
+    const donate = await DonateNumberModel.create(req.body);
     return successResponse(res, "Donate number created successfully", donate);
   } catch (error) {
     return errorResponse(res, "Error creating donate number", error);
   }
 });
+
 
 // Get all Donate Numbers
 router.get("/api/get-all-donate-numbers", userAuth, async (req, res) => {
@@ -30,22 +28,23 @@ router.get("/api/get-all-donate-numbers", userAuth, async (req, res) => {
 });
 
 // Get single donate number by ID
-router.get("/api/get-donate-number/:id", userAuth, async (req, res) => {
+router.post("/api/get-donate-number", userAuth, async (req, res) => {
   try {
-    const { id } = req.params;
-    const donate = await DonateNumberModel.findByPk(id);
-
+    const { donateId } = req.body;
+    const donate = await DonateNumberModel.findByPk(donateId);
+    console.log(donate)
     if (!donate) {
       return errorResponse(res, "Donate number not found");
     }
 
     return successResponse(res, "Donate number fetched successfully", donate);
   } catch (error) {
+    console.log(error)
     return errorResponse(res, "Error fetching donate number", error);
   }
 });
 
-// Update donate number
+// // Update donate number
 router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -65,7 +64,7 @@ router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
   }
 });
 
-// Delete donate number
+// // Delete donate number
 router.delete("/api/delete-donate", userAuth, async (req, res) => {
   try {
     const { id } = req.params;

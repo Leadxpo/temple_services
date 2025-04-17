@@ -44,18 +44,14 @@ const userAuth = async (req, res, next) => {
     const token = req.cookies.token;
     const verifyToken = jwt.verify(token, "vamsi@1998"); 
 
-    const { id } = verifyToken;
+    const { userId } = verifyToken; // ✅ FIXED LINE
 
-    // Fetch user by ID
-    const user = await UserModel.findOne({ where: { id } });
+    // Fetch user by userId instead of id
+    const user = await UserModel.findOne({ where: { userId } }); // ✅ FIXED LINE
 
     if (!user) {
       return res.status(401).json({ error: "User does not exist" });
     }
-
-    // if (user.role !== "Super Admin" && user.role !== "Admin") {
-    //   return res.status(403).json({ error: "Invalid user role" });
-    // }
 
     req.user = user;
     next();
@@ -63,6 +59,7 @@ const userAuth = async (req, res, next) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 
