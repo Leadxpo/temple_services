@@ -26,7 +26,7 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-router.post("/register", upload.single("profilePic"), async (req, res) => {
+router.post("/api/register", upload.single("profilePic"), async (req, res) => {
   try {
     console.log("Received Data:", req.body);
 
@@ -57,7 +57,7 @@ router.post("/register", upload.single("profilePic"), async (req, res) => {
 
 
 // Login Route
-router.post("/login", async (req, res) => {
+router.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = systemUserModel.findOne({ where: { email } });
@@ -99,7 +99,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Profile Route
-router.get("/get-user", SystemUserAuth, async (req, res) => {
+router.get("/api/get-user", SystemUserAuth, async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from req.user
 
@@ -117,7 +117,7 @@ router.get("/get-user", SystemUserAuth, async (req, res) => {
 
 
 // Get All Profiles
-router.get("/all-user", SystemUserAuth, async (req, res) => {
+router.get("/api/all-user", SystemUserAuth, async (req, res) => {
   try {
     const users = systemUserModel.findAll();
     return successResponse(res, "All users fetched successfully", users);
@@ -127,7 +127,7 @@ router.get("/all-user", SystemUserAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/user-update", SystemUserAuth, upload.single("profilePic"), async (req, res) => {
+router.patch("/api/user-update", SystemUserAuth, upload.single("profilePic"), async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from authenticated user
     const user = systemUserModel.findOne({ where: { userId } });
@@ -154,13 +154,13 @@ router.patch("/user-update", SystemUserAuth, upload.single("profilePic"), async 
 });
 
 // Logout
-router.post("/logout", (req, res) => {
+router.post("/api/logout", (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
   return successResponse(res, "Logged out successfully");
 });
 
 // Delete User by userId
-router.delete("/delete-user", SystemUserAuth, async (req, res) => {
+router.delete("/api/delete-user", SystemUserAuth, async (req, res) => {
   try {
     const { userId } = req.user;
 
