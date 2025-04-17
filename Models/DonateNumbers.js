@@ -9,7 +9,6 @@ module.exports = (sequelize) => {
         primaryKey: true,
       },
       donateNumber: { type: DataTypes.STRING,},
-      decription: { type: DataTypes.STRING },
       UserId: { type: DataTypes.STRING },
       UserName: { type: DataTypes.STRING },
       phoneNumber: { type: DataTypes.STRING,},
