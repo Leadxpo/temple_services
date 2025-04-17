@@ -38,7 +38,7 @@ const createtable = () => {
         sequelize.authenticate();
 
         systemUser.sync({ alter: false })
-        User.sync({ alter: true })
+        User.sync({ alter: false })
         Otp.sync({ alter: false })
         BlockedNumbers.sync({ alter: false })
         Payments.sync({ alter: false })
