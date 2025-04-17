@@ -3,6 +3,7 @@ const UserModel = require('../Models/Users')(sequelize);
 const { Op } = require("sequelize");
 const express = require('express');
 const router = express.Router();
+
 const multer = require('multer'); 
 const jwt = require("jsonwebtoken");
 const path = require('path');
@@ -53,7 +54,7 @@ router.post("/api/register", upload.single("profilePic"), async (req, res) => {
     const user = await UserModel.create(req.body);
     return successResponse(res, "User added successfully", user);
   } catch (error) {
-    console.error("Error Saving User:", error);
+    console.error("Error Saving User:", error); 
     return errorResponse(res, "Error saving user", error);
   }
 });
@@ -101,7 +102,7 @@ router.post("/api/login", async (req, res) => {
         aadharNumber: user.aadharNumber,
         address: user.address,
         dob: user.dob,
-        marrege_status: user.marrege_status,
+        marrege_status: user.marregeStatus,
         gender: user.gender,
         password: user.password,
         id: user.id,
@@ -192,7 +193,7 @@ router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (r
 });
 
 // Logout
-router.post("/logout", (req, res) => {
+router.post("/api/logout", (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
   return successResponse(res, "Logged out successfully");
 });

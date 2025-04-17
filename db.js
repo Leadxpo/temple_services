@@ -1,41 +1,28 @@
-const { Sequelize, Model } = require('sequelize')
+const { Sequelize, Model } = require("sequelize");
 
-const systemUserModel = require('./Models/SystemUser')
-const UserModel = require('./Models/Users')
-const OtpModel = require('./Models/Otp')
-const BlockedNumbersModel = require('./Models/BlockedNumbers')
-const PaymentsModel = require('./Models/Payments')
-const DonateModel = require('./Models/DonateNumbers')
-
-
+const systemUserModel = require("./Models/SystemUser");
+const UserModel = require("./Models/Users");
+const OtpModel = require("./Models/Otp");
 
 const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
 
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: process.env.DB_PROVIDER,
+  }
+);
 
-    {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        dialect: process.env.DB_PROVIDER,
-    }
-)
-
-const systemUser = systemUserModel(sequelize)
-const User = UserModel(sequelize)
-const Otp = OtpModel(sequelize)
-const BlockedNumbers = BlockedNumbersModel(sequelize)
-const Payments = PaymentsModel(sequelize)
-const Donate = DonateModel(sequelize)
-
-
-
-
+const systemUser = systemUserModel(sequelize);
+const User = UserModel(sequelize);
+const Otp = OtpModel(sequelize);
 
 const createtable = () => {
-    try {
-        sequelize.authenticate();
+  try {
+    sequelize.authenticate();
 
         systemUser.sync({ alter: false })
         User.sync({ alter: false })
@@ -47,20 +34,10 @@ const createtable = () => {
 
        
 
+    console.log("table created");
+  } catch (error) {
+    console.log("error" + error);
+  }
+};
 
-
-
-
-
-
-
-
-        console.log("table created")
-
-    }
-    catch (error) {
-        console.log("error" + error)
-    }
-}
-
-module.exports = { sequelize, createtable }
+module.exports = { sequelize, createtable };

@@ -66,6 +66,7 @@ router.post("/api/register", upload.single("profilePic"), async (req, res) => {
 });
 
 
+// Login Route
 router.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
