@@ -66,7 +66,7 @@ router.patch("/api/update-otp/:otpId", async (req, res) => {
 });
 
 // Delete OTP
-router.delete("/delete-otp/:otpId", async (req, res) => {
+router.delete("/api/delete-otp/:otpId", async (req, res) => {
   try {
     const { otpId } = req.params;
 

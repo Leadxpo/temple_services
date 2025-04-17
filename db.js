@@ -24,9 +24,15 @@ const createtable = () => {
   try {
     sequelize.authenticate();
 
-    systemUser.sync({ alter: false });
-    User.sync({ alter: false });
-    Otp.sync({ alter: false });
+        systemUser.sync({ alter: false })
+        User.sync({ alter: false })
+        Otp.sync({ alter: false })
+        BlockedNumbers.sync({ alter: false })
+        Payments.sync({ alter: false })
+        Donate.sync({ alter: false })
+
+
+       
 
     console.log("table created");
   } catch (error) {

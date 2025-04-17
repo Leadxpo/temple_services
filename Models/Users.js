@@ -23,7 +23,17 @@ module.exports = (Sequelize) => {
       aadharNumber: { type: DataTypes.STRING ,unique: true },
       gender: { type: DataTypes.STRING  },
 
-      // donateNumber: { type: DataTypes.STRING },
+            donateNumber: { type: DataTypes.STRING,  },
+            
+            address: { type: DataTypes.STRING, },
+            
+            dob: { type: DataTypes.STRING },
+
+            gender: { type: DataTypes.STRING },
+            
+            marriage_status: { type: DataTypes.STRING },
+            
+            profilePic: { type: DataTypes.STRING },
 
       address: { type: DataTypes.STRING },
 

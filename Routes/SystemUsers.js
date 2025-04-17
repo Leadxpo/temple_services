@@ -10,11 +10,21 @@ const bcrypt = require("bcrypt");
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { deleteImage } = require("../Midileware/deleteimages");
 const { SystemUserAuth } = require("../Midileware/Auth");
+const fs = require('fs');
+// const path = require('path');
 
-// Image configuration
+
+
+// Make sure folder exists
+const uploadPath = path.join(__dirname, "storage", "userdp");
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// Multer storage config
 const imageconfig = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, "./storege/userdp");
+    callback(null, uploadPath);
   },
   filename: (req, file, callback) => {
     callback(null, Date.now() + path.extname(file.originalname));
@@ -60,11 +70,14 @@ router.post("/api/register", upload.single("profilePic"), async (req, res) => {
 router.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = systemUserModel.findOne({ where: { email } });
+
+    // ✅ Await this call
+    const user = await systemUserModel.findOne({ where: { email } });
 
     if (!user) {
       return errorResponse(res, "User not found");
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -73,7 +86,8 @@ router.post("/api/login", async (req, res) => {
 
     const token = jwt.sign(
       { userId: user.userId, email: user.email, userName: user.userName },
-      "vamsi@1998"
+      "vamsi@1998", // ❗ Consider storing this secret in .env
+      { expiresIn: "2h" }
     );
 
     res.cookie("token", token, {
@@ -94,24 +108,28 @@ router.post("/api/login", async (req, res) => {
     });
 
   } catch (error) {
-    return errorResponse(res, "Login failed", error);
+    console.error("Login error:", error); // For better debugging
+    return errorResponse(res, "Login failed", error.message || error);
   }
 });
+
+
 
 // Profile Route
 router.get("/api/get-user", SystemUserAuth, async (req, res) => {
   try {
     const { userId } = req.user; // Extract userId from req.user
 
-    const user = systemUserModel.findOne({ where: { userId } });
+    // ✅ Await the database call
+    const user = await systemUserModel.findOne({ where: { userId } });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found", data: null });
     }
 
     return successResponse(res, "User profile fetched successfully", user);
   } catch (error) {
-    return errorResponse(res, "Failed to fetch profile", error);
+    return errorResponse(res, "Failed to fetch profile", error.message || error);
   }
 });
 
@@ -182,7 +200,7 @@ router.delete("/api/delete-user", SystemUserAuth, async (req, res) => {
 
 
 // Forgot Password
-router.post("/forgot-password", async (req, res) => {
+router.post("/api/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = systemUserModel.findOne({ where: { email } });
@@ -201,7 +219,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // Reset Password
-router.post("/reset-password", SystemUserAuth, async (req, res) => {
+router.post("/api/reset-password", SystemUserAuth, async (req, res) => {
   try {
     const { password, newPassword } = req.body;
     const user = req.user;

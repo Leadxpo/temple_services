@@ -9,13 +9,9 @@ const path = require('path')
 const systemUser = require('./Routes/SystemUsers')
 const User = require('./Routes/Usres')
 const Otp = require('./Routes/Otp')
-
-
-
-
-
-
-
+const BlockedNumber = require('./Routes/BlockedNumber')
+const Payments = require('./Routes/payments')
+const Donate = require('./Routes/DonateNumbers')
 
 
 
@@ -47,6 +43,9 @@ app.use('/storege', express.static(path.join(__dirname, 'storege')));
 app.use('/systemuser', systemUser)
 app.use('/user', User)
 app.use('/otp', Otp)
+app.use('/blockednumber', BlockedNumber)
+app.use('/payments', Payments)
+app.use('/donate', Donate)
 
 
 
