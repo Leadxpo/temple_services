@@ -42,7 +42,7 @@ const createtable = () => {
         Otp.sync({ alter: false })
         BlockedNumbers.sync({ alter: false })
         Payments.sync({ alter: false })
-        Donate.sync({ alter: false })
+        Donate.sync({ alter: true })
 
 
        

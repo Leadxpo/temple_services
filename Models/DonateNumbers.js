@@ -11,6 +11,11 @@ module.exports = (sequelize) => {
       donateNumber: { type: DataTypes.STRING,},
       decription: { type: DataTypes.STRING },
       UserId: { type: DataTypes.STRING },
+      UserName: { type: DataTypes.STRING },
+      phoneNumber: { type: DataTypes.STRING,},
+      dob: { type: DataTypes.STRING },
+      relation: { type: DataTypes.STRING },
+      gothram: { type: DataTypes.STRING },
       
     },
     {

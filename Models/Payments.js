@@ -12,7 +12,6 @@ module.exports = (sequelize) => {
       phoneNumber: { type: DataTypes.STRING },
       email: { type: DataTypes.STRING,  allowNull: false },
       Gothram: { type: DataTypes.STRING, allowNull: false },
-      Zodex: { type: DataTypes.STRING, allowNull: false },
       paymentRecept: { type: DataTypes.STRING },
       amount: { type: DataTypes.STRING, allowNull: true },
 

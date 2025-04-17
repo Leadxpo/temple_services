@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { sequelize } = require('../db');
 const DonateNumberModel = require('../Models/DonateNumbers')(sequelize); // 🔁 Updated model
+const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
@@ -65,7 +66,7 @@ router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
 });
 
 // Delete donate number
-router.delete("/api/delete-donate-number/:id", userAuth, async (req, res) => {
+router.delete("/api/delete-donate", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -82,5 +83,53 @@ router.delete("/api/delete-donate-number/:id", userAuth, async (req, res) => {
     return errorResponse(res, "Error deleting donate number", error);
   }
 });
+
+
+// ✅ Route to check if number exists in either donate or blocked
+router.post('/api/check-number',  async (req, res) => {
+  try {
+    const { number } = req.body;
+
+    if (!number) {
+      return res.status(400).json({
+        success: false,
+        message: "Donate number is required",
+        data: null,
+        error: null
+      });
+    }
+
+    const isDonateNumber = await DonateNumberModel.findOne({
+      where: { donateNumber: number },
+    });
+
+    const isBlockedNumber = await BlockedNumberModel.findOne({
+      where: { blockedNumber: number },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Number checked successfully",
+      data: {
+        isDonateNumber: !!isDonateNumber,
+        isBlockedNumber: !!isBlockedNumber,
+      },
+      error: null,
+    });
+  } catch (error) {
+    return errorResponse(res, "Error checking number", error);
+  }
+});
+
+module.exports = router;
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

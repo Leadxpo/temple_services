@@ -18,7 +18,7 @@ const SystemUserAuth = async (req, res, next) => {
 
     // Fetch user by ID
     const user = await systemUserModel.findOne({ where: { userId } });
-
+   console.log("=========Auth========>",user)
     if (!user) {
       return res.status(401).json({ error: "User does not exist" });
     }
@@ -44,10 +44,10 @@ const userAuth = async (req, res, next) => {
     const token = req.cookies.token;
     const verifyToken = jwt.verify(token, "vamsi@1998"); 
 
-    const { userId } = verifyToken;
+    const { id } = verifyToken;
 
     // Fetch user by ID
-    const user = await UserModel.findOne({ where: { userId } });
+    const user = await UserModel.findOne({ where: { id } });
 
     if (!user) {
       return res.status(401).json({ error: "User does not exist" });

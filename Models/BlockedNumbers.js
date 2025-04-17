@@ -3,21 +3,15 @@ module.exports = (sequelize) => {
   const systemUserModel = sequelize.define(
     'blockedNumbers',
     {
-      Id: {
+      userId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      
       blockedNumber: { type: DataTypes.STRING,},
-      BookingNumber: { type: DataTypes.STRING },
-      UserId: { type: DataTypes.STRING },
-      status: {
-        type: DataTypes.STRING,
-        defaultValue: "Pending",
-        validate: {
-          isIn: [["Declined", "Approved", "Pending"]],
-        },
-      },
+     
+      
     },
     {
       timestamps: true,

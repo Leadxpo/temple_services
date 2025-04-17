@@ -119,32 +119,47 @@ router.post("/api/login", async (req, res) => {
 
 
 // Profile Route
-router.get("/api/get-user", userAuth, async (req, res) => {
+router.get("/api/get-user", async (req, res) => {
+  console.log("ggg",req.body)
   try {
-    const { userId } = req.user; // Extract userId from req.user
+    const { id } = req.body; // ✅ Correctly extract id
 
-    const user = UserModel.findOne({ where: { userId } });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (!id) {
+      return res.status(400).json({ success: false, message: "id is required" });
     }
 
-    return successResponse(res, "User profile fetched successfully", user);
+    const user = await UserModel.findOne({ where: { id } }); // ✅ Await this
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile fetched successfully",
+      data: user,
+      error: null,
+    });
   } catch (error) {
-    return errorResponse(res, "Failed to fetch profile", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch profile",
+      data: null,
+      error: error.message,
+    });
   }
 });
 
 
-// Get All Profiles
-router.get("/api/all-user", userAuth, async (req, res) => {
+router.get("/api/all-user", async (req, res) => {
   try {
-    const users = UserModel.findAll();
+    const users = await UserModel.findAll(); // ⬅️ await is necessary
     return successResponse(res, "All users fetched successfully", users);
   } catch (error) {
     return errorResponse(res, "Failed to fetch users", error);
   }
 });
+
 
 // Update User
 router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
