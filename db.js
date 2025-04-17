@@ -3,6 +3,8 @@ const { Sequelize, Model } = require("sequelize");
 const systemUserModel = require("./Models/SystemUser");
 const UserModel = require("./Models/Users");
 const OtpModel = require("./Models/Otp");
+const BlockedNumberModel = require("./Models/BlockedNumbers");
+
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
