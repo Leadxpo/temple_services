@@ -89,6 +89,7 @@ router.get("/api/get-payment/:id", userAuth, async (req, res) => {
 });
 
 // Update payment
+
 router.patch("/api/update-payment/:id", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
