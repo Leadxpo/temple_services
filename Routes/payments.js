@@ -40,23 +40,19 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
     const {
       userId,
       userName,
-      email,
       Gothram,
       amount,
       paymentMethod,
       paymentStatus,
-      transactionId
     } = req.body;
 
     const payment = await PaymentModel.create({
       userId,
       userName,
-      email,
       Gothram,
       amount,
       paymentMethod,
       paymentStatus,
-      transactionId,
       paymentRecept: req.file?.filename || null,
     });
 
@@ -135,5 +131,20 @@ router.delete("/api/delete-payment/:id", userAuth, async (req, res) => {
     return errorResponse(res, "Error deleting payment", error);
   }
 });
+
+router.get("/api/total-payments", userAuth, async (req, res) => {
+  try {
+    const totalPayments = await PaymentModel.count();
+
+    return successResponse(res, "Total payments count fetched", {
+      totalPayments,
+    });
+  } catch (error) {
+    return errorResponse(res, "Error fetching total payments count", error);
+  }
+});
+
+
+
 
 module.exports = router;

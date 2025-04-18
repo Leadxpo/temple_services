@@ -145,4 +145,20 @@ router.delete("/api/delete-blocked-number/:id", userAuth, async (req, res) => {
   }
 });
 
+
+
+router.get("/api/blocked-number-count", userAuth, async (req, res) => {
+  try {
+    const blockedCount = await BlockedNumberModel.count();
+
+    return successResponse(res, "Blocked number count fetched", 
+      blockedCount,
+);
+  } catch (error) {
+    return errorResponse(res, "Error fetching blocked number count", error);
+  }
+});
+
+
+
 module.exports = router;
