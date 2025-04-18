@@ -4,18 +4,60 @@ const { sequelize } = require('../db');
 const PaymentModel = require('../Models/Payments')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer'); 
 
-// Create Payment
-router.post("/api/create-payment", userAuth, async (req, res) => {
+
+
+
+// Ensure the directory exists
+const uploadDir = path.join(__dirname, "../storege/payments");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer image configuration
+const imageconfig = multer.diskStorage({
+  destination: (req, file, callback) => {
+    callback(null, uploadDir);
+  },
+  filename: (req, file, callback) => {
+    callback(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: imageconfig,
+  limits: { fileSize: 1000000000 }
+});
+
+
+
+
+router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, async (req, res) => {
   try {
-    const { userId, amount, paymentMethod, paymentStatus, transactionId } = req.body;
+    const {
+      userId,
+      userName,
+      email,
+      Gothram,
+      amount,
+      paymentMethod,
+      paymentStatus,
+      transactionId
+    } = req.body;
 
     const payment = await PaymentModel.create({
       userId,
+      userName,
+      email,
+      Gothram,
       amount,
       paymentMethod,
       paymentStatus,
       transactionId,
+      paymentRecept: req.file?.filename || null,
     });
 
     return successResponse(res, "Payment created successfully", payment);

@@ -12,6 +12,7 @@ const { successResponse, errorResponse } = require("../Midileware/response");
 const { deleteImage } = require("../Midileware/deleteimages");
 const { userAuth } = require("../Midileware/Auth");
 const fs = require('fs');
+const DonateNumbers = require('../Models/DonateNumbers');
 
 // Ensure the directory exists
 const uploadDir = path.join(__dirname, "../storege/userdp");
@@ -101,6 +102,7 @@ router.post("/api/login", async (req, res) => {
         phoneNumber: user.phoneNumber,
         aadharNumber: user.aadharNumber,
         address: user.address,
+        donateNumber: user.donateNumber,
         dob: user.dob,
         marrege_status: user.marregeStatus,
         gender: user.gender,

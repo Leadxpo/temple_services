@@ -8,21 +8,21 @@ const { userAuth } = require("../Midileware/Auth");
 // POST /donate/api/block-single
 router.post('/api/block-single', async (req, res) => {
   try {
-    const { donateNumber } = req.body;
+    const { blockedNumber } = req.body;
 
-    if (!donateNumber) {
-      return res.status(400).json({ message: "Donate number is required" });
+    if (!blockedNumber) {
+      return res.status(400).json({ message: "Block number is required" });
     }
 
-    const [record, created] = await Donate.findOrCreate({
-      where: { donate_number: donateNumber },
+    const [record, created] = await BlockedNumberModel.findOrCreate({
+      where: { blockedNumber: blockedNumber },
       defaults: {
-        donate_number: donateNumber,
+        blockedNumber: blockedNumber,
         isBlocked: true,
         description: req.body.description || null,
       },
     });
-
+    
     if (!created) {
       record.isBlocked = true;
       await record.save();
@@ -37,7 +37,7 @@ router.post('/api/block-single', async (req, res) => {
 
 
 // POST /donate/api/block-range
-router.post('/block-range', async (req, res) => {
+router.post('/api/block-range', async (req, res) => {
   try {
     const { from, to } = req.body;
 
@@ -54,10 +54,10 @@ router.post('/block-range', async (req, res) => {
 
     const promises = [];
     for (let i = fromNum; i <= toNum; i++) {
-      const donate_number = i.toString();
+      const blockedNumber = i.toString();
       promises.push(
-        Donate.findOrCreate({
-          where: { donate_number },
+        BlockedNumberModel.findOrCreate({
+          where: { blockedNumber },
           defaults: { isBlocked: true }
         }).then(([record, created]) => {
           if (!created) {
@@ -81,7 +81,7 @@ router.post('/block-range', async (req, res) => {
 
 
 // Get all blocked numbers
-router.get("/api/get-all-blocked-numbers", userAuth, async (req, res) => {
+router.get("/api/get-all-blocked-numbers",  async (req, res) => {
   try {
     const blockedNumbers = await BlockedNumberModel.findAll();
     return successResponse(res, "Blocked numbers fetched successfully", blockedNumbers);

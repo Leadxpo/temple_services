@@ -9,8 +9,23 @@ module.exports = (sequelize) => {
         primaryKey: true,
       },
       
-      blockedNumber: { type: DataTypes.STRING,},
-      description: { type: DataTypes.STRING,},
+      blockedNumber: {
+        type: DataTypes.STRING,
+      },
+      description: {
+        type: DataTypes.STRING,
+
+      },
+
+      status: {
+        type: DataTypes.STRING, 
+      },
+
+      isBlocked: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      }
+      
      
       
     },

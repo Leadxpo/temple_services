@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      donateNumber: { type: DataTypes.STRING,},
+      donateNumber: { type: DataTypes.STRING, unique: true },
       UserId: { type: DataTypes.STRING },
       UserName: { type: DataTypes.STRING },
       phoneNumber: { type: DataTypes.STRING,},

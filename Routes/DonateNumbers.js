@@ -63,11 +63,6 @@ router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
 });
 
 
-
-
-
-
-
 // // Update donate number
 router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
   try {
