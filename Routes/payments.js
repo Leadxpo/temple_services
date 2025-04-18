@@ -63,7 +63,7 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
 });
 
 // Get all payments
-router.get("/api/get-all-payments", userAuth, async (req, res) => {
+router.get("/api/get-all-payments",  async (req, res) => {
   try {
     const payments = await PaymentModel.findAll();
     return successResponse(res, "Payments fetched successfully", payments);

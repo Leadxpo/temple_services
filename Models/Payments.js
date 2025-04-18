@@ -3,7 +3,7 @@ module.exports = (sequelize) => {
   const systemUserModel = sequelize.define(
     'payments',
     {
-      userId: {
+      paymentId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
@@ -12,6 +12,7 @@ module.exports = (sequelize) => {
       phoneNumber: { type: DataTypes.STRING,  unique: true},
       donateNumber: { type: DataTypes.STRING, unique: true },
       Gothram: { type: DataTypes.STRING, allowNull: false },
+      userId: { type: DataTypes.STRING, allowNull: false },
       paymentRecept: { type: DataTypes.STRING },
       amount: { type: DataTypes.STRING, allowNull: true },
 
