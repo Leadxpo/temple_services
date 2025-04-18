@@ -104,6 +104,22 @@ router.delete("/api/delete-donate", userAuth, async (req, res) => {
 });
 
 
+router.get("/api/get-all-pending-donates", userAuth, async (req, res) => {
+  try {
+    const pendingDonates = await DonateNumberModel.findAll({
+      where: {
+        status: 'Pending'
+      }
+    });
+
+    return successResponse(res, "Pending donate numbers fetched successfully", pendingDonates);
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, "Error fetching pending donate numbers", error);
+  }
+});
+
+
 // ✅ Route to check if number exists in either donate or blocked
 router.post('/api/check-number',  async (req, res) => {
   try {

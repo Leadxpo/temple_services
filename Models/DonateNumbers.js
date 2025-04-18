@@ -16,6 +16,13 @@ module.exports = (sequelize) => {
       relation: { type: DataTypes.STRING },
       gothram: { type: DataTypes.STRING },
       
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "Pending",
+        validate: {
+          isIn: [["Declined", "Approved", "Pending"]],
+        },
+      },
     },
     {
       timestamps: true,
