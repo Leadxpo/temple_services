@@ -43,7 +43,7 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
       Gothram,
       amount,
       paymentMethod,
-      paymentStatus,
+      donateNumber
     } = req.body;
 
     const payment = await PaymentModel.create({
@@ -52,7 +52,7 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
       Gothram,
       amount,
       paymentMethod,
-      paymentStatus,
+      donateNumber,
       paymentRecept: req.file?.filename || null,
     });
 
