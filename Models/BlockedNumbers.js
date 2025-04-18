@@ -3,13 +3,14 @@ module.exports = (sequelize) => {
   const systemUserModel = sequelize.define(
     'blockedNumbers',
     {
-      userId: {
+      blockId: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       
       blockedNumber: { type: DataTypes.STRING,},
+      description: { type: DataTypes.STRING,},
      
       
     },

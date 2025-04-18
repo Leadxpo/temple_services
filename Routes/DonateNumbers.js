@@ -6,7 +6,7 @@ const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
-router.post("/api/create-donate-number", async (req, res) => {
+router.post("/api/create-donate-number",userAuth, async (req, res) => {
   try {
     console.log("Form Data Received:", req.body);
     const donate = await DonateNumberModel.create(req.body);
@@ -28,7 +28,7 @@ router.get("/api/get-all-donate-numbers", userAuth, async (req, res) => {
 });
 
 // Get single donate number by ID
-router.post("/api/get-donate-number", userAuth, async (req, res) => {
+router.post("/api/get-by-donateId", userAuth, async (req, res) => {
   try {
     const { donateId } = req.body;
     const donate = await DonateNumberModel.findByPk(donateId);
@@ -43,6 +43,30 @@ router.post("/api/get-donate-number", userAuth, async (req, res) => {
     return errorResponse(res, "Error fetching donate number", error);
   }
 });
+
+
+// Get single donate number by ID
+router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
+  try {
+    const { donateNumber } = req.body;
+    const donate = await DonateNumberModel.findByPk(donateNumber);
+    console.log(donate)
+    if (!donate) {
+      return errorResponse(res, "Donate number not found");
+    }
+
+    return successResponse(res, "Donate number fetched successfully", donate);
+  } catch (error) {
+    console.log(error)
+    return errorResponse(res, "Error fetching donate number", error);
+  }
+});
+
+
+
+
+
+
 
 // // Update donate number
 router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {

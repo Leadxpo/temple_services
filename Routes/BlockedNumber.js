@@ -5,18 +5,80 @@ const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
-// Create Blocked Number
-router.post("/api/create-blocked-number", userAuth, async (req, res) => {
+// POST /donate/api/block-single
+router.post('/api/block-single', async (req, res) => {
   try {
-    const { phoneNumber, reason } = req.body;
+    const { donateNumber } = req.body;
 
-    const blocked = await BlockedNumberModel.create({ phoneNumber, reason });
+    if (!donateNumber) {
+      return res.status(400).json({ message: "Donate number is required" });
+    }
 
-    return successResponse(res, "Blocked number created successfully", blocked);
+    const [record, created] = await Donate.findOrCreate({
+      where: { donate_number: donateNumber },
+      defaults: {
+        donate_number: donateNumber,
+        isBlocked: true,
+        description: req.body.description || null,
+      },
+    });
+
+    if (!created) {
+      record.isBlocked = true;
+      await record.save();
+    }
+
+    res.status(200).json({ message: "Number blocked successfully", data: record });
   } catch (error) {
-    return errorResponse(res, "Error creating blocked number", error);
+    console.error("Error blocking single number:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
+// POST /donate/api/block-range
+router.post('/block-range', async (req, res) => {
+  try {
+    const { from, to } = req.body;
+
+    if (!from || !to || isNaN(from) || isNaN(to)) {
+      return res.status(400).json({ message: "Valid 'from' and 'to' numbers are required" });
+    }
+
+    const fromNum = parseInt(from);
+    const toNum = parseInt(to);
+
+    if (fromNum > toNum) {
+      return res.status(400).json({ message: "'From' number must be less than or equal to 'To' number" });
+    }
+
+    const promises = [];
+    for (let i = fromNum; i <= toNum; i++) {
+      const donate_number = i.toString();
+      promises.push(
+        Donate.findOrCreate({
+          where: { donate_number },
+          defaults: { isBlocked: true }
+        }).then(([record, created]) => {
+          if (!created) {
+            record.isBlocked = true;
+            return record.save();
+          }
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    res.status(200).json({ message: `Blocked numbers from ${from} to ${to}` });
+  } catch (error) {
+    console.error("Error blocking range:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+
 
 // Get all blocked numbers
 router.get("/api/get-all-blocked-numbers", userAuth, async (req, res) => {
