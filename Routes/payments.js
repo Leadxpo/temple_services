@@ -133,7 +133,7 @@ router.delete("/api/delete-payment/:id", userAuth, async (req, res) => {
   }
 });
 
-router.get("/api/total-payments", userAuth, async (req, res) => {
+router.get("/api/total-payments",  async (req, res) => {
   try {
     const totalPayments = await PaymentModel.count();
 

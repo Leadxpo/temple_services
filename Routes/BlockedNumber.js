@@ -80,15 +80,18 @@ router.post('/api/block-range', async (req, res) => {
 
 
 
-// Get all blocked numbers
-router.get("/api/get-all-blocked-numbers",  async (req, res) => {
+// Get all blocked numbers sorted from small to big
+router.get("/api/get-all-blocked-numbers", async (req, res) => {
   try {
-    const blockedNumbers = await BlockedNumberModel.findAll();
+    const blockedNumbers = await BlockedNumberModel.findAll({
+      order: [["blockedNumber", "ASC"]],  // Sorting the blocked numbers in ascending order
+    });
     return successResponse(res, "Blocked numbers fetched successfully", blockedNumbers);
   } catch (error) {
     return errorResponse(res, "Error fetching blocked numbers", error);
   }
 });
+
 
 // Get single blocked number by ID
 router.get("/api/get-blocked-number/:id", userAuth, async (req, res) => {
@@ -126,12 +129,14 @@ router.patch("/api/update-blocked-number/:id", userAuth, async (req, res) => {
   }
 });
 
-// Delete blocked number
-router.delete("/api/delete-blocked-number/:id", userAuth, async (req, res) => {
+// Delete blocked number using route param
+router.delete("/api/delete-blocked-number/:blockedNumber", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { blockedNumber } = req.params;
 
-    const blocked = await BlockedNumberModel.findByPk(id);
+    const blocked = await BlockedNumberModel.findOne({
+      where: { blockedNumber }
+    });
 
     if (!blocked) {
       return errorResponse(res, "Blocked number not found");
@@ -146,8 +151,7 @@ router.delete("/api/delete-blocked-number/:id", userAuth, async (req, res) => {
 });
 
 
-
-router.get("/api/blocked-number-count", userAuth, async (req, res) => {
+router.get("/api/blocked-number-count",  async (req, res) => {
   try {
     const blockedCount = await BlockedNumberModel.count();
 

@@ -19,7 +19,7 @@ router.post("/api/create-donate-number",userAuth, async (req, res) => {
 
 
 // Get all Donate Numbers
-router.get("/api/get-all-donate-numbers", userAuth, async (req, res) => {
+router.get("/api/get-all-donate-numbers",  async (req, res) => {
   try {
     const donateNumbers = await DonateNumberModel.findAll();
     return successResponse(res, "Donate numbers fetched successfully", donateNumbers);
@@ -46,23 +46,25 @@ router.post("/api/get-by-donateId", userAuth, async (req, res) => {
 });
 
 
-// Get single donate number by ID
+// Get single donate number by donateNumber field
 router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
   try {
     const { donateNumber } = req.body;
-    const donate = await DonateNumberModel.findByPk(donateNumber);
-    console.log(donate)
+    console.log('Request donateNumber:', donateNumber);
+
+    const donate = await DonateNumberModel.findOne({ where: { donateNumber } });
+    console.log('Donate fetched:', donate);
+
     if (!donate) {
       return errorResponse(res, "Donate number not found");
     }
 
     return successResponse(res, "Donate number fetched successfully", donate);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return errorResponse(res, "Error fetching donate number", error);
   }
 });
-
 
 // // Update donate number
 router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
@@ -104,7 +106,7 @@ router.delete("/api/delete-donate", userAuth, async (req, res) => {
 });
 
 
-router.get("/api/get-all-pending-donates", userAuth, async (req, res) => {
+router.get("/api/get-all-pending-donates",  async (req, res) => {
   try {
     const pendingDonates = await DonateNumberModel.findAll({
       where: {
@@ -118,6 +120,19 @@ router.get("/api/get-all-pending-donates", userAuth, async (req, res) => {
     return errorResponse(res, "Error fetching pending donate numbers", error);
   }
 });
+
+
+router.get("/api/count-pending-donates", async (req, res) => {
+  try {
+    const count = await DonateNumberModel.count();
+
+    return successResponse(res, "Pending donate numbers count fetched successfully", count);
+  } catch (error) {
+    console.log(error);
+    return errorResponse(res, "Error fetching pending donate numbers count", error);
+  }
+});
+
 
 
 // ✅ Route to check if number exists in either donate or blocked
