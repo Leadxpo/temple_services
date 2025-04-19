@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         defaultValue: "Pending",
         validate: {
-          isIn: [["Declined", "Approved", "Pending"]],
+          isIn: [["Declined", "Approved", "Pending","Admin Assign"]],
         },
       },
     },

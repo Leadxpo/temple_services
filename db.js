@@ -39,9 +39,9 @@ const createtable = () => {
         systemUser.sync({ alter: false })
         User.sync({ alter: false })
         Otp.sync({ alter: false })
-        BlockedNumbers.sync({ alter: true })
-        Payments.sync({ alter: true })
-        DonateNumbers.sync({ alter: true })
+        BlockedNumbers.sync({ alter: false })
+        Payments.sync({ alter: false })
+        DonateNumbers.sync({ alter: false })
 
 
        

@@ -96,7 +96,7 @@ router.post("/api/login", async (req, res) => {
         address: user.address,
         donateNumber: user.donateNumber,
         dob: user.dob,
-        marrege_status: user.marregeStatus,
+        marriage_status: user.marriage_status,
         gender: user.gender,
         password: user.password,
         id: user.id,
@@ -113,11 +113,11 @@ router.post("/api/login", async (req, res) => {
 
 
 // Profile Route
-router.get("/api/get-user", async (req, res) => {
+router.post("/api/get-user", async (req, res) => {
   console.log("ggg",req.body)
   try {
     const { id } = req.body; // ✅ Correctly extract id
-
+    console.log("ggg id",id)
     if (!id) {
       return res.status(400).json({ success: false, message: "id is required" });
     }
@@ -158,7 +158,7 @@ router.get("/api/all-user", async (req, res) => {
 // Update User
 router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
-    const { userId } = req.user; // Extract userId from authenticated user
+    const { userId } = req.body; // Extract userId from authenticated user
 
     // Await the database query to get the user
     const user = await UserModel.findOne({ where: { userId } });

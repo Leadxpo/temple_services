@@ -66,13 +66,13 @@ router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
   }
 });
 
-/// Update donate status
-router.patch("/api/update-donate-status", userAuth, async (req, res) => {
+router.patch("/api/update-donate-status/:donateId",  async (req, res) => {
   try {
-    const { id } = req.params;
+    const { donateId } = req.params;
     const { status } = req.body;
 
-    const donate = await DonateNumberModel.findByPk(id);
+    // Try using findOne if findByPk fails
+    const donate = await DonateNumberModel.findOne({ where: { donateNumber: donateId } });
 
     if (!donate) {
       return errorResponse(res, "Donate number not found");
