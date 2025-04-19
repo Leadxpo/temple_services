@@ -18,9 +18,9 @@ module.exports = (sequelize) => {
       },
 
       status: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,
+        defaultValue: 'Active', // Default value is set to 'Active'
       },
-
       isBlocked: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

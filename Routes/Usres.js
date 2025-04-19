@@ -65,34 +65,26 @@ router.post("/api/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
     
-    // Await the query to get the user
     const user = await UserModel.findOne({ where: { userId } });
 
     if (!user) {
       return errorResponse(res, "User not found");
     }
 
-    // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return errorResponse(res, "Invalid password");
     }
 
-    // Generate token
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user.userId, email: user.email, userName: user.userName },
-      "vamsi@1998"
+      "vamsi@1998", // Move this to environment variable in production!
+      { expiresIn: "2h" }
     );
 
-    // Set the token as a cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 2 * 60 * 60 * 1000
-    });
-
+    // Return token in response body (no cookies)
     return successResponse(res, "Login successful", {
       token,
       user: {
@@ -109,16 +101,15 @@ router.post("/api/login", async (req, res) => {
         password: user.password,
         id: user.id,
         profilePic: user.profilePic,
-
-       
       }
     });
 
   } catch (error) {
-    console.error("Login Error:", error); // Log the error to debug
+    console.error("Login Error:", error);
     return errorResponse(res, "Login failed", error);
   }
 });
+
 
 
 // Profile Route

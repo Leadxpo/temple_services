@@ -66,11 +66,11 @@ router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
   }
 });
 
-// // Update donate number
-router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
+/// Update donate status
+router.patch("/api/update-donate-status", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { phoneNumber, reason } = req.body;
+    const { status } = req.body;
 
     const donate = await DonateNumberModel.findByPk(id);
 
@@ -78,11 +78,11 @@ router.patch("/api/update-donate-number/:id", userAuth, async (req, res) => {
       return errorResponse(res, "Donate number not found");
     }
 
-    await donate.update({ phoneNumber, reason });
+    await donate.update({ status });
 
-    return successResponse(res, "Donate number updated successfully", donate);
+    return successResponse(res, "Donate number status updated successfully", donate);
   } catch (error) {
-    return errorResponse(res, "Error updating donate number", error);
+    return errorResponse(res, "Error updating donate number status", error);
   }
 });
 
