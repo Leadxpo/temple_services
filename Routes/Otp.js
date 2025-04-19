@@ -7,7 +7,7 @@ const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
 // Create OTP
-router.post("/create-otp", async (req, res) => {
+router.post("/api/create-otp", async (req, res) => {
   try {
     const { userId, otpCode, expiresIn } = req.body;
 
@@ -27,7 +27,7 @@ router.post("/create-otp", async (req, res) => {
 });
 
 // Get OTP by ID
-router.get("/get-otp/:otpId", async (req, res) => {
+router.get("/api/get-otp/:otpId", async (req, res) => {
   try {
     const { otpId } = req.params;
 
@@ -45,7 +45,7 @@ router.get("/get-otp/:otpId", async (req, res) => {
 });
 
 // Update OTP
-router.patch("/update-otp/:otpId", async (req, res) => {
+router.patch("/api/update-otp/:otpId", async (req, res) => {
   try {
     const { otpId } = req.params;
     const { otpCode, expiresIn } = req.body;
@@ -66,7 +66,7 @@ router.patch("/update-otp/:otpId", async (req, res) => {
 });
 
 // Delete OTP
-router.delete("/delete-otp/:otpId", async (req, res) => {
+router.delete("/api/delete-otp/:otpId", async (req, res) => {
   try {
     const { otpId } = req.params;
 
