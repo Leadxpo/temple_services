@@ -6,7 +6,7 @@ const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
-router.post("/api/create-donate-number",userAuth, async (req, res) => {
+router.post("/api/create-donate-number", async (req, res) => {
   try {
     console.log("Form Data Received:", req.body);
     const donate = await DonateNumberModel.create(req.body);

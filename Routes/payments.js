@@ -40,7 +40,7 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
     const {
       userId,
       userName,
-      Gothram,
+      gothram,
       amount,
       paymentMethod,
       donateNumber
@@ -49,7 +49,7 @@ router.post("/api/create-payment", upload.single("paymentRecept"), userAuth, asy
     const payment = await PaymentModel.create({
       userId,
       userName,
-      Gothram,
+      gothram,
       amount,
       paymentMethod,
       donateNumber,

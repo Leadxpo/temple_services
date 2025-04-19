@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       userName: { type: DataTypes.STRING, allowNull: false },
       phoneNumber: { type: DataTypes.STRING,  unique: true},
       donateNumber: { type: DataTypes.STRING, unique: true },
-      Gothram: { type: DataTypes.STRING, allowNull: false },
+      gothram: { type: DataTypes.STRING, allowNull: false },
       userId: { type: DataTypes.STRING, allowNull: false },
       paymentRecept: { type: DataTypes.STRING },
       amount: { type: DataTypes.STRING, allowNull: true },
