@@ -72,6 +72,21 @@ router.get("/api/get-all-payments",  async (req, res) => {
   }
 });
 
+
+// Get pending payments only
+router.get("/api/get-pending-payments", async (req, res) => {
+  try {
+    const pendingPayments = await PaymentModel.findAll({
+      where: { status: "pending" },
+    });
+    return successResponse(res, "Pending payments fetched successfully", pendingPayments);
+  } catch (error) {
+    return errorResponse(res, "Error fetching pending payments", error);
+  }
+});
+
+
+
 // Get single payment by ID
 router.get("/api/get-payment/:id", userAuth, async (req, res) => {
   try {
@@ -132,6 +147,62 @@ router.delete("/api/delete-payment/:id", userAuth, async (req, res) => {
     return errorResponse(res, "Error deleting payment", error);
   }
 });
+
+
+
+router.patch("/api/update-payment-status/:paymentId", async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const { status } = req.body;
+
+    // Find payment by paymentNumber (formerly donateNumber)
+    const payment = await DonateNumberModel.findOne({ where: { donateNumber: paymentId } });
+
+    if (!payment) {
+      return errorResponse(res, "Payment not found");
+    }
+
+    await payment.update({ status });
+
+    return successResponse(res, "Payment status updated successfully", payment);
+  } catch (error) {
+    return errorResponse(res, "Error updating payment status", error);
+  }
+});
+
+
+
+router.put("/api/update-payment-status/:donateNumber", 
+  async (req, res) => {
+  console.log("Received request to update payment status:", req.params);
+
+  try {
+    const { donateNumber } = req.params;
+    const { status } = req.body;
+    console.log("Received request to update payment status: donateNumber", donateNumber);
+
+    
+    const payment = await PaymentModel.findOne({ where: {donateNumber: donateNumber } });
+
+    if (!payment) {
+      console.log("Payment not found for donateNumber:", donateNumber);
+      return errorResponse(res, "Payment not found");
+    }
+
+    await payment.update({ status });
+
+    console.log("Payment status updated successfully");
+    return successResponse(res, "Payment status updated successfully", payment);
+  } catch (error) {
+    console.error("❌ Error updating payment status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating payment status",
+      error: error.message || error.toString(),
+    });
+  }
+});
+
 
 router.get("/api/total-payments",  async (req, res) => {
   try {

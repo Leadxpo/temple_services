@@ -66,7 +66,7 @@ router.post("/api/get-by-donate-number", userAuth, async (req, res) => {
   }
 });
 
-router.patch("/api/update-donate-status/:donateId",  async (req, res) => {
+router.put("/api/update-donate-status/:donateId",  async (req, res) => {
   try {
     const { donateId } = req.params;
     const { status } = req.body;
@@ -85,6 +85,31 @@ router.patch("/api/update-donate-status/:donateId",  async (req, res) => {
     return errorResponse(res, "Error updating donate number status", error);
   }
 });
+
+
+
+router.put("/api/update-donate-status/:donateNumber", async (req, res) => {
+  try {
+    const { donateNumber } = req.params;
+    const { status } = req.body;
+
+    console.log("Updating status for donateNumber:", donateNumber, "to:", status);
+
+    const donate = await DonateNumberModel.findOne({ where: { donateNumber } });
+
+    if (!donate) {
+      return errorResponse(res, "Donate number not found");
+    }
+
+    await donate.update({ status });
+
+    return successResponse(res, "Donate number status updated successfully", donate);
+  } catch (error) {
+    console.error("Error updating donate number status:", error);
+    return errorResponse(res, "Error updating donate number status", error.message || error);
+  }
+});
+
 
 // // Delete donate number
 router.delete("/api/delete-donate", userAuth, async (req, res) => {
