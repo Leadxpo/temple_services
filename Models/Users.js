@@ -12,7 +12,7 @@ module.exports = (Sequelize) => {
 
       userName: { type: DataTypes.STRING },
 
-      phoneNumber: { type: DataTypes.STRING },
+      phoneNumber: { type: DataTypes.STRING, unique: true },
 
       email: { type: DataTypes.STRING, unique: true },
 

@@ -87,18 +87,19 @@ router.post("/api/login", async (req, res) => {
     return successResponse(res, "Login successful", {
       token,
       user: {
+        id: user.id,
         userId: user.userId,
-        email: user.email,
+        password: user.password,
         userName: user.userName,
+        gender: user.gender,
+        email: user.email,
         phoneNumber: user.phoneNumber,
         aadharNumber: user.aadharNumber,
         address: user.address,
         donateNumber: user.donateNumber,
         dob: user.dob,
+        gothram: user.gothram,
         marriage_status: user.marriage_status,
-        gender: user.gender,
-        password: user.password,
-        id: user.id,
         profilePic: user.profilePic,
       }
     });
