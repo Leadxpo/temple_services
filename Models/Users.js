@@ -24,6 +24,8 @@ module.exports = (Sequelize) => {
       
       gender: { type: DataTypes.STRING },
 
+      gothram: { type: DataTypes.STRING },
+
       donateNumber: { type: DataTypes.STRING },
 
       address: { type: DataTypes.STRING },
