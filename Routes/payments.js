@@ -208,9 +208,7 @@ router.get("/api/total-payments",  async (req, res) => {
   try {
     const totalPayments = await PaymentModel.count();
 
-    return successResponse(res, "Total payments count fetched", {
-      totalPayments,
-    });
+    return successResponse(res, "Total payments count fetched", totalPayments);
   } catch (error) {
     return errorResponse(res, "Error fetching total payments count", error);
   }

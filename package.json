@@ -24,6 +24,7 @@
     "fs": "^0.0.1-security",
     "http-build-query": "^0.7.0",
     "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.48",
     "mongodb": "^6.8.0",
     "mongoose": "^8.4.4",
     "mongose": "^0.0.2-security",

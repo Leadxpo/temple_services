@@ -1,23 +1,20 @@
-const fs = require("fs")
-const {errorResponse,successResponse} = require("./response")
-const path = require("path")
+const fs = require("fs");
+const path = require("path");
 
+const deleteImage = async (imagePath) => {
+  return new Promise((resolve, reject) => {
+    const fullPath = path.join(__dirname, "../storege/userdp", imagePath);
+    fs.unlink(fullPath, (error) => {
+      if (error) {
+        console.error("Error deleting file:", error);
+        return reject(error); // Reject so you can catch it later
+      }
+      console.log("Successfully deleted");
+      resolve("deleted");
+    });
+  });
+};
 
-const deleteImage = async(ImagePath)=>{
-    fs.unlink(`./storege/userdp/${ImagePath}`, (error)=>{
-        if (error)
-         {
-            errorResponse(error)
-        }
-         else 
-        {
-           console.log("sucessfuly deleted") 
-           successResponse("sucess")
-        }
-    })
-}
-
-
-module.exports={
-    deleteImage
-}
+module.exports = {
+  deleteImage
+};

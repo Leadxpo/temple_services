@@ -34,10 +34,23 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-// Register route
 router.post("/api/register", upload.single("profilePic"), async (req, res) => {
   try {
     console.log("Received Data:", req.body);
+
+    const { phoneNumber, aadharNumber } = req.body;
+
+    // Check if phone number already exists
+    const existingPhone = await UserModel.findOne({ where: { phoneNumber } });
+    if (existingPhone) {
+      return errorResponse(res, "Phone number already exists");
+    }
+
+    // Check if aadhar number already exists
+    const existingAadhar = await UserModel.findOne({ where: { aadharNumber } });
+    if (existingAadhar) {
+      return errorResponse(res, "Aadhar number already exists");
+    }
 
     // Hash password
     if (req.body.password) {
@@ -54,7 +67,7 @@ router.post("/api/register", upload.single("profilePic"), async (req, res) => {
     const user = await UserModel.create(req.body);
     return successResponse(res, "User added successfully", user);
   } catch (error) {
-    console.error("Error Saving User:", error); 
+    console.error("Error Saving User:", error);
     return errorResponse(res, "Error saving user", error);
   }
 });
@@ -154,36 +167,36 @@ router.get("/api/all-user", async (req, res) => {
   }
 });
 
-
-// Update User
 router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
-    const { userId } = req.body; // Extract userId from authenticated user
+    const { id } = req.body;
 
-    // Await the database query to get the user
-    const user = await UserModel.findOne({ where: { userId } });
-
+    const user = await UserModel.findOne({ where: { id } });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Handle Profile Picture Update
     if (req.file) {
       if (user.profilePic) {
-        await deleteImage(user.profilePic); // Delete old image if exists
+        try {
+          await deleteImage(user.profilePic); // Now it works fine
+        } catch (err) {
+          console.error("File delete failed:", err);
+          // Optional: don't block update even if delete fails
+        }
       }
-      req.body.profilePic = req.file.filename; // Set new profile picture filename
+      req.body.profilePic = req.file.filename;
     }
 
-    // Update User Data
     await user.update(req.body);
-
     return successResponse(res, "Profile updated successfully", user);
   } catch (error) {
-    console.error("Profile Update Error:", error); // Log the error
+    console.error("Update error:", error);
     return errorResponse(res, "Profile update failed", error);
   }
 });
+
+
 
 // Logout
 router.post("/api/logout", (req, res) => {
@@ -191,28 +204,22 @@ router.post("/api/logout", (req, res) => {
   return successResponse(res, "Logged out successfully");
 });
 
-// Delete User by userId
-router.delete("/api/delete-user", userAuth, async (req, res) => {
+router.delete("/api/delete-user/:id", async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.params;
 
-    // Await the database query to fetch the user
-    const user = await UserModel.findOne({ where: { userId } });
-
+    const user = await UserModel.findOne({ where: { id } });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Delete the user
     await user.destroy();
-
-    return successResponse(res, "User deleted successfully");
+    return res.status(200).json({ success: true, message: "User deleted" });
   } catch (error) {
-    console.error("User Deletion Error:", error); // Log the error for debugging
-    return errorResponse(res, "User deletion failed", error);
+    console.error("Error deleting user:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
-
 
 // Forgot Password
 router.post("/api/forgot-password", async (req, res) => {

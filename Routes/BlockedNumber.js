@@ -39,7 +39,7 @@ router.post('/api/block-single', async (req, res) => {
 // POST /donate/api/block-range
 router.post('/api/block-range', async (req, res) => {
   try {
-    const { from, to } = req.body;
+    const { from, to, description, status } = req.body;
 
     if (!from || !to || isNaN(from) || isNaN(to)) {
       return res.status(400).json({ message: "Valid 'from' and 'to' numbers are required" });
@@ -55,13 +55,20 @@ router.post('/api/block-range', async (req, res) => {
     const promises = [];
     for (let i = fromNum; i <= toNum; i++) {
       const blockedNumber = i.toString();
+
       promises.push(
         BlockedNumberModel.findOrCreate({
           where: { blockedNumber },
-          defaults: { isBlocked: true }
-        }).then(([record, created]) => {
+          defaults: {
+            isBlocked: true,
+            description: description || "",
+            status: status || "active"
+          }
+        }).then(async ([record, created]) => {
           if (!created) {
             record.isBlocked = true;
+            record.description = description || record.description;
+            record.status = status || record.status;
             return record.save();
           }
         })
@@ -75,8 +82,6 @@ router.post('/api/block-range', async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
 
 
 
