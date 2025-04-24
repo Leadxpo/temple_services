@@ -42,7 +42,7 @@ module.exports = (Sequelize) => {
 
       dob: { type: DataTypes.STRING },
 
-      description: { type: DataTypes.STRING },
+      // description: { type: DataTypes.STRING },
 
 
       marriage_status: { type: DataTypes.STRING },

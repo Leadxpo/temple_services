@@ -102,7 +102,10 @@ router.post("/api/login", async (req, res) => {
         userId: user.userId,
         email: user.email,
         userName: user.userName,
-        role: user.role
+        profilePic: user.profilePic,
+        phoneNumber: user.phoneNumber,
+        userId: user.role,
+        status: user.status,
       }
     });
 
