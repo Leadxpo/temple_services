@@ -170,8 +170,9 @@ router.get("/api/all-user", async (req, res) => {
 router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
     const { id } = req.body;
-
+console.log("1111111111111111>",id)
     const user = await UserModel.findOne({ where: { id } });
+
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
