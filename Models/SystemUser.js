@@ -15,14 +15,11 @@ module.exports = (sequelize) => {
       role: { type: DataTypes.STRING, allowNull: false },
       profilePic: { type: DataTypes.STRING },
       emergencyContact: { type: DataTypes.STRING, allowNull: true },
-      skills: { type: DataTypes.STRING },
-      status: {
-        type: DataTypes.STRING,
-        defaultValue: "Pending",
-        validate: {
-          isIn: [["Declined", "Approved", "Pending"]],
-        },
-      },
+      address: { type: DataTypes.STRING },
+      dob: { type: DataTypes.STRING },
+      aadharNumber: { type: DataTypes.STRING },
+
+      
     },
     {
       timestamps: true,

@@ -38,6 +38,8 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: 'true' }))
 app.use(bodyParser.json({ limit: '100mb' }))
 app.use('/storege', express.static(path.join(__dirname, 'storege')));
+// app.use("/storege/userdp", express.static(path.join(__dirname, "storege/userdp")));
+
 
 
 app.use('/systemuser', systemUser)

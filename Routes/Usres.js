@@ -34,7 +34,7 @@ const upload = multer({
   limits: { fileSize: 1000000000 }
 });
 
-router.post("/api/register", upload.single("profilePic"), async (req, res) => {
+router.post("/register", upload.single("profilePic"), async (req, res) => {
   try {
     console.log("Received Data:", req.body);
 
@@ -73,7 +73,7 @@ router.post("/api/register", upload.single("profilePic"), async (req, res) => {
 });
 
 // Login Route
-router.post("/api/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { userId, password } = req.body;
     
@@ -126,7 +126,7 @@ router.post("/api/login", async (req, res) => {
 
 
 // Profile Route
-router.post("/api/get-user", async (req, res) => {
+router.post("/get-user", async (req, res) => {
   console.log("ggg",req.body)
   try {
     const { id } = req.body; // ✅ Correctly extract id
@@ -158,7 +158,7 @@ router.post("/api/get-user", async (req, res) => {
 });
 
 
-router.get("/api/all-user", async (req, res) => {
+router.get("/all-user", async (req, res) => {
   try {
     const users = await UserModel.findAll(); // ⬅️ await is necessary
     return successResponse(res, "All users fetched successfully", users);
@@ -167,7 +167,7 @@ router.get("/api/all-user", async (req, res) => {
   }
 });
 
-router.patch("/api/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
+router.patch("/user-update", userAuth, upload.single("profilePic"), async (req, res) => {
   try {
     const { id } = req.body;
 console.log("1111111111111111>",id)
@@ -200,12 +200,12 @@ console.log("1111111111111111>",id)
 
 
 // Logout
-router.post("/api/logout", (req, res) => {
+router.post("/logout", (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
   return successResponse(res, "Logged out successfully");
 });
 
-router.delete("/api/delete-user/:id", async (req, res) => {
+router.delete("/delete-user/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -223,7 +223,7 @@ router.delete("/api/delete-user/:id", async (req, res) => {
 });
 
 // Forgot Password
-router.post("/api/forgot-password", async (req, res) => {
+router.post("/forgot-password", async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = UserModel.findOne({ where: { email } });
@@ -242,7 +242,7 @@ router.post("/api/forgot-password", async (req, res) => {
 });
 
 // Reset Password
-router.post("/api/reset-password", userAuth, async (req, res) => {
+router.post("/reset-password", userAuth, async (req, res) => {
   try {
     const { password, newPassword } = req.body;
     const user = req.user;

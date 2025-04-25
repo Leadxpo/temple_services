@@ -1,19 +1,22 @@
 const fs = require("fs");
 const path = require("path");
 
-const deleteImage = async (imagePath) => {
+const deleteImage = (fileName) => {
+  const filePath = path.join(__dirname, "../storege/userdp", fileName);
   return new Promise((resolve, reject) => {
-    const fullPath = path.join(__dirname, "../storege/userdp", imagePath);
-    fs.unlink(fullPath, (error) => {
-      if (error) {
-        console.error("Error deleting file:", error);
-        return reject(error); // Reject so you can catch it later
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        // File doesn't exist, just resolve
+        return resolve();
       }
-      console.log("Successfully deleted");
-      resolve("deleted");
+      fs.unlink(filePath, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
     });
   });
 };
+
 
 module.exports = {
   deleteImage

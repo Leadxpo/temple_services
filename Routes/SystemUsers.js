@@ -15,16 +15,16 @@ const fs = require('fs');
 
 
 
-// Make sure folder exists
-const uploadPath = path.join(__dirname, "storage", "userdp");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
+// Ensure the directory exists
+const uploadDir = path.join(__dirname, "../storege/userdp");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer storage config
+// Multer image configuration
 const imageconfig = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, uploadPath);
+    callback(null, uploadDir);
   },
   filename: (req, file, callback) => {
     callback(null, Date.now() + path.extname(file.originalname));
@@ -104,8 +104,11 @@ router.post("/api/login", async (req, res) => {
         userName: user.userName,
         profilePic: user.profilePic,
         phoneNumber: user.phoneNumber,
-        userId: user.role,
-        status: user.status,
+        role: user.role,
+        dob: user.dob,
+        address: user.address,
+        aadharNumber: user.aadharNumber,
+
       }
     });
 
@@ -147,10 +150,11 @@ router.get("/api/all-user", SystemUserAuth, async (req, res) => {
 });
 
 // Update User
-router.patch("/api/user-update", SystemUserAuth, upload.single("profilePic"), async (req, res) => {
+router.put("/api/user-update", SystemUserAuth, upload.single("profilePic"), async (req, res) => {
   try {
-    const { userId } = req.user; // Extract userId from authenticated user
-    const user = systemUserModel.findOne({ where: { userId } });
+    const { userId } = req.body;
+
+    const user = await systemUserModel.findOne({ where: { userId } }); // ✅ await here
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -172,6 +176,7 @@ router.patch("/api/user-update", SystemUserAuth, upload.single("profilePic"), as
     return errorResponse(res, "Profile update failed", error);
   }
 });
+
 
 // Logout
 router.post("/api/logout", (req, res) => {
@@ -220,14 +225,12 @@ router.post("/api/forgot-password", async (req, res) => {
   }
 });
 
-// Reset Password
 router.post("/api/reset-password", SystemUserAuth, async (req, res) => {
   try {
-    const { password, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
     const user = req.user;
 
-    const isMatch = await bcrypt.compare(password, user.password);
-
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return errorResponse(res, "Invalid current password");
     }
@@ -240,5 +243,9 @@ router.post("/api/reset-password", SystemUserAuth, async (req, res) => {
     return errorResponse(res, "Error resetting password", error);
   }
 });
+
+
+
+
 
 module.exports = router;
