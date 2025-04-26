@@ -89,13 +89,7 @@ router.post("/api/login", async (req, res) => {
       { expiresIn: "2h" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 2 * 60 * 60 * 1000
-    });
-
+console.log("rrr ", user.userId)
     return successResponse(res, "Login successful", {
       token,
       user: {

@@ -2,38 +2,52 @@ const express = require('express');
 const router = express.Router();
 const { sequelize } = require('../db');
 const BlockedNumberModel = require('../Models/BlockedNumbers')(sequelize);
+const DonateModel = require('../Models/DonateNumbers')(sequelize); // import Donate model
 const { successResponse, errorResponse } = require("../Midileware/response");
 const { userAuth } = require("../Midileware/Auth");
 
 // POST /donate/api/block-single
 router.post('/api/block-single', async (req, res) => {
   try {
-    const { blockedNumber } = req.body;
+    const { blockedNumber, description,status } = req.body;
 
     if (!blockedNumber) {
-      return res.status(400).json({ message: "Block number is required" });
+      return res.status(400).json({ message: "Blocked number is required" });
     }
 
+    // ✅ Check if number already exists in Donate table (correct field name!)
+    const donated = await DonateModel.findOne({ where: { donateNumber: blockedNumber } });
+
+    if (donated) {
+      return res.status(400).json({ message: "This number already exists in the donated list" });
+    }
+
+    // ✅ If not donated, block it
     const [record, created] = await BlockedNumberModel.findOrCreate({
-      where: { blockedNumber: blockedNumber },
+      where: { blockedNumber },
       defaults: {
-        blockedNumber: blockedNumber,
+        blockedNumber,
         isBlocked: true,
-        description: req.body.description || null,
+        description: description || null,
+        status: status || null,
+
       },
     });
-    
+
     if (!created) {
       record.isBlocked = true;
       await record.save();
     }
 
     res.status(200).json({ message: "Number blocked successfully", data: record });
+
   } catch (error) {
     console.error("Error blocking single number:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
 
 
 // POST /donate/api/block-range
@@ -52,37 +66,48 @@ router.post('/api/block-range', async (req, res) => {
       return res.status(400).json({ message: "'From' number must be less than or equal to 'To' number" });
     }
 
-    const promises = [];
+    const skippedNumbers = []; // ⬅️ to collect numbers that are already donated
+
     for (let i = fromNum; i <= toNum; i++) {
       const blockedNumber = i.toString();
 
-      promises.push(
-        BlockedNumberModel.findOrCreate({
-          where: { blockedNumber },
-          defaults: {
-            isBlocked: true,
-            description: description || "",
-            status: status || "active"
-          }
-        }).then(async ([record, created]) => {
-          if (!created) {
-            record.isBlocked = true;
-            record.description = description || record.description;
-            record.status = status || record.status;
-            return record.save();
-          }
-        })
-      );
+      // ✅ Check first: is this number already donated?
+      const donated = await DonateModel.findOne({ where: { donateNumber: blockedNumber } });
+
+      if (donated) {
+        // ⬅️ If donated, skip this number and continue
+        skippedNumbers.push(blockedNumber);
+        continue;
+      }
+
+      // ✅ If not donated, then block it
+      const [record, created] = await BlockedNumberModel.findOrCreate({
+        where: { blockedNumber },
+        defaults: {
+          isBlocked: true,
+          description: description || "",
+          status: status || "active"
+        }
+      });
+
+      if (!created) {
+        record.isBlocked = true;
+        record.description = description || record.description;
+        record.status = status || record.status;
+        await record.save();
+      }
     }
 
-    await Promise.all(promises);
-    res.status(200).json({ message: `Blocked numbers from ${from} to ${to}` });
+    res.status(200).json({ 
+      message: `Blocked numbers from ${from} to ${to} successfully.`,
+      skippedNumbers: skippedNumbers.length > 0 ? skippedNumbers : "No numbers skipped"
+    });
+
   } catch (error) {
     console.error("Error blocking range:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 
 // Get all blocked numbers sorted from small to big

@@ -157,6 +157,38 @@ router.post("/get-user", async (req, res) => {
   }
 });
 
+// Profile Route
+router.post("/get-by-userId", async (req, res) => {
+  console.log("ggg",req.body)
+  try {
+    const { userId } = req.body; // ✅ Correctly extract userId
+    console.log("ggg userId",userId)
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    const user = await UserModel.findOne({ where: { userId } }); // ✅ Await this
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile fetched successfully",
+      data: user,
+      error: null,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch profile",
+      data: null,
+      error: error.message,
+    });
+  }
+});
+
 
 router.get("/all-user", async (req, res) => {
   try {
@@ -196,6 +228,45 @@ console.log("1111111111111111>",id)
     return errorResponse(res, "Profile update failed", error);
   }
 });
+
+
+
+router.put("/user-update-donateNumber",  async (req, res) => {
+  try {
+    const { userId, donateNumber } = req.body;
+    console.log("Updating userId:", userId);
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    const user = await UserModel.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Only update donateNumber
+    user.donateNumber = donateNumber;
+
+    await user.save(); // Save the updated user
+
+    return res.status(200).json({
+      success: true,
+      message: "Donate number updated successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.error("Update error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Profile update failed",
+      error: error.message,
+    });
+  }
+});
+
+
 
 
 
